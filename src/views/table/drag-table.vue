@@ -6,7 +6,7 @@
       fit
       highlight-current-row
       :data="
-        tableData.filter(
+        resData.filter(
           (data) =>
             !search || data.player.toLowerCase().includes(search.toLowerCase())
         )
@@ -26,7 +26,6 @@
       <el-table-column label="Tournament" prop="tournaments_played">
       </el-table-column>
     </el-table>
-    {{ resData }}
   </div>
 </template>
 
@@ -38,32 +37,6 @@ export default {
     return {
       listLoading: true,
       resData: null,
-      tableData: [
-        {
-          ranking: "1",
-          country: "SRB",
-          player: "Novak Djokovic",
-          age: "34",
-          points: "8,420",
-          tournaments_played: "13",
-        },
-        {
-          ranking: "2",
-          country: "RUS",
-          player: "Daniil Medvedev",
-          age: "26",
-          points: "8,410",
-          tournaments_played: "23",
-        },
-        {
-          ranking: "3",
-          country: "GER",
-          player: "Alexander Zverev",
-          age: "24",
-          points: "7,195",
-          tournaments_played: "23",
-        },
-      ],
       search: "",
     };
   },
