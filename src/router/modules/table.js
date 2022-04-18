@@ -8,33 +8,33 @@ const tableRouter = {
   redirect: '/table/complex-table',
   name: 'Table',
   meta: {
-    title: 'Table',
+    title: 'Rankings',
     icon: 'table'
   },
   children: [
     {
-      path: 'dynamic-table',
-      component: () => import('@/views/table/dynamic-table/index'),
-      name: 'DynamicTable',
-      meta: { title: 'Dynamic Table' }
-    },
-    {
       path: 'drag-table',
       component: () => import('@/views/table/drag-table'),
       name: 'DragTable',
-      meta: { title: 'Drag Table' }
+      meta: { title: 'Ranking Masculino' }
     },
     {
       path: 'inline-edit-table',
       component: () => import('@/views/table/inline-edit-table'),
       name: 'InlineEditTable',
-      meta: { title: 'Inline Edit' }
+      meta: { title: 'Femenino Ranking' }
     },
     {
       path: 'complex-table',
       component: () => import('@/views/table/complex-table'),
       name: 'ComplexTable',
-      meta: { title: 'Complex Table' }
+      meta: { title: 'Ranking Mixto' }
+    },
+    {
+      path: 'complex-tables',
+      component: () => import('@/views/table/complex-tables'),
+      name: 'ComplexTables',
+      meta: { title: 'Ranking Parejas' }
     }
   ]
 }

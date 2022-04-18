@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-editor-container">
-    <div class=" clearfix">
+    <!--div class=" clearfix">
       <pan-thumb :image="avatar" style="float: left">
         Your roles:
         <span v-for="item in roles" :key="item" class="pan-info-roles">{{ item }}</span>
@@ -13,18 +13,18 @@
     </div>
     <div>
       <img :src="emptyGif" class="emptyGif">
-    </div>
+    </div-->
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import PanThumb from '@/components/PanThumb'
-import GithubCorner from '@/components/GithubCorner'
+//  import PanThumb from '@/components/PanThumb'
+//  import GithubCorner from '@/components/GithubCorner'
 
 export default {
   name: 'DashboardEditor',
-  components: { PanThumb, GithubCorner },
+  //  components: { PanThumb, GithubCorner },
   data() {
     return {
       emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'

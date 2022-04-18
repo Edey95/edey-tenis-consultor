@@ -1,153 +1,93 @@
 <template>
   <div class="app-container">
-    <!-- Note that row-key is necessary to get a correct row order. -->
-    <el-table ref="dragTable" v-loading="listLoading" :data="list" row-key="id" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="ID" width="65">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+    <el-table
+      v-loading="listLoading"
+      border
+      fit
+      highlight-current-row
+      :data="
+        tableData.filter(
+          (data) =>
+            !search || data.player.toLowerCase().includes(search.toLowerCase())
+        )
+      "
+      style="width: 100%"
+    >
+      <el-table-column align="right">
+        <template slot="header" slot-scope="scope">
+          <el-input v-model="search" size="mini" placeholder="Type to search" />
         </template>
       </el-table-column>
-
-      <el-table-column width="180px" align="center" label="Date">
-        <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column min-width="300px" label="Title">
-        <template slot-scope="{row}">
-          <span>{{ row.title }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="110px" align="center" label="Author">
-        <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="100px" label="Importance">
-        <template slot-scope="{row}">
-          <svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="icon-star" />
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="Readings" width="95">
-        <template slot-scope="{row}">
-          <span>{{ row.pageviews }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column class-name="status-col" label="Status" width="110">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="Drag" width="80">
-        <template slot-scope="{}">
-          <svg-icon class="drag-handler" icon-class="drag" />
-        </template>
+      <el-table-column label="Rank" prop="ranking"> </el-table-column>
+      <el-table-column label="Name" prop="player"> </el-table-column>
+      <el-table-column label="Country" prop="country"> </el-table-column>
+      <el-table-column label="Age" prop="age"> </el-table-column>
+      <el-table-column label="Points" prop="points"> </el-table-column>
+      <el-table-column label="Tournament" prop="tournaments_played">
       </el-table-column>
     </el-table>
-    <div class="show-d">
-      <el-tag>The default order :</el-tag> {{ oldList }}
-    </div>
-    <div class="show-d">
-      <el-tag>The after dragging order :</el-tag> {{ newList }}
-    </div>
+    {{ resData }}
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
-import Sortable from 'sortablejs'
+import axios from "axios";
 
 export default {
-  name: 'DragTable',
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
-      list: null,
-      total: null,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 10
-      },
-      sortable: null,
-      oldList: [],
-      newList: []
-    }
+      resData: null,
+      tableData: [
+        {
+          ranking: "1",
+          country: "SRB",
+          player: "Novak Djokovic",
+          age: "34",
+          points: "8,420",
+          tournaments_played: "13",
+        },
+        {
+          ranking: "2",
+          country: "RUS",
+          player: "Daniil Medvedev",
+          age: "26",
+          points: "8,410",
+          tournaments_played: "23",
+        },
+        {
+          ranking: "3",
+          country: "GER",
+          player: "Alexander Zverev",
+          age: "24",
+          points: "7,195",
+          tournaments_played: "23",
+        },
+      ],
+      search: "",
+    };
   },
-  created() {
-    this.getList()
+  mounted() {
+    const axiosInstance = axios.create({
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+    axiosInstance
+      .get("https://tennis-api-master.vercel.app/api/atp/rankings/singles")
+      .then((response) => {
+        this.resData = response.data;
+      })
+      .catch((e) => alert(e));
+    this.listLoading = false;
   },
   methods: {
-    async getList() {
-      this.listLoading = true
-      const { data } = await fetchList(this.listQuery)
-      this.list = data.items
-      this.total = data.total
-      this.listLoading = false
-      this.oldList = this.list.map(v => v.id)
-      this.newList = this.oldList.slice()
-      this.$nextTick(() => {
-        this.setSort()
-      })
+    handleEdit(index, row) {
+      console.log(index, row);
     },
-    setSort() {
-      const el = this.$refs.dragTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        ghostClass: 'sortable-ghost', // Class name for the drop placeholder,
-        setData: function(dataTransfer) {
-          // to avoid Firefox bug
-          // Detail see : https://github.com/RubaXa/Sortable/issues/1012
-          dataTransfer.setData('Text', '')
-        },
-        onEnd: evt => {
-          const targetRow = this.list.splice(evt.oldIndex, 1)[0]
-          this.list.splice(evt.newIndex, 0, targetRow)
-
-          // for show the changes, you can delete in you code
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
-        }
-      })
-    }
-  }
-}
+    handleDelete(index, row) {
+      console.log(index, row);
+    },
+  },
+};
 </script>
-
-<style>
-.sortable-ghost{
-  opacity: .8;
-  color: #fff!important;
-  background: #42b983!important;
-}
-</style>
-
-<style scoped>
-.icon-star{
-  margin-right:2px;
-}
-.drag-handler{
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-.show-d{
-  margin-top: 15px;
-}
-</style>
