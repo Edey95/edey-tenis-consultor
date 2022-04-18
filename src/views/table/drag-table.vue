@@ -26,6 +26,16 @@
       <el-table-column label="Tournament" prop="tournaments_played">
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page.sync="currentPage4"
+      :page-sizes="[100, 200, 300, 400]"
+      :page-size="100"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+    >
+    </el-pagination>
   </div>
 </template>
 
@@ -38,6 +48,16 @@ export default {
       listLoading: true,
       resData: null,
       search: "",
+      list: null,
+      total: 0,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sort: "+ranking",
+      },
     };
   },
   mounted() {
@@ -50,6 +70,8 @@ export default {
       .get("https://tennis-api-master.vercel.app/api/atp/rankings/singles")
       .then((response) => {
         this.resData = response.data;
+        this.list = response.data.items
+        this.total = response.data.total
       })
       .catch((e) => alert(e));
     this.listLoading = false;
@@ -60,6 +82,12 @@ export default {
     },
     handleDelete(index, row) {
       console.log(index, row);
+    },
+    handleSizeChange(val) {
+      console.log(`${val} items per page`);
+    },
+    handleCurrentChange(val) {
+      console.log(`current page: ${val}`);
     },
   },
 };
